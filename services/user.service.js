@@ -1,5 +1,21 @@
 const User = require('../models/UserModel');
 
+// Get All Users
+const getAllUsers = async () => {
+    try {
+        const users = await User.find({});
+        if (!users) {
+            throw new Error('No users found');
+        }
+        return users;
+    } catch (error) {
+        if (error.message === 'No users found') {
+            throw new Error('Failed to get users: No users found');
+        }
+        throw new Error('Failed to get users');
+    }
+};
+
 // Function to get a user by ID
 const getUserById = async (userId) => {
     try {
@@ -9,7 +25,11 @@ const getUserById = async (userId) => {
         }
         return user;
     } catch (error) {
-        throw new Error('Failed to get user');
+        if(error.message === 'User not found'){
+            throw new Error('Failed to delete user: User not found')
+        }else{
+        throw new Error('Failed to delete user');
+        }
     }
 };
 
@@ -22,7 +42,11 @@ const updateUser = async (userId, userData) => {
         }
         return user;
     } catch (error) {
-        throw new Error('Failed to update user');
+        if(error.message === 'User not found'){
+            throw new Error('Failed to delete user: User not found')
+        }else{
+        throw new Error('Failed to delete user');
+        }
     }
 };
 
@@ -35,7 +59,11 @@ const deleteUser = async (userId) => {
         }
         return user;
     } catch (error) {
+        if(error.message === 'User not found'){
+            throw new Error('Failed to delete user: User not found')
+        }else{
         throw new Error('Failed to delete user');
+        }
     }
 };
 
@@ -44,12 +72,14 @@ const updatePassword = async (userId, currentPassword, newPassword) => {
     try {
       // Find the user by ID
     const user = await User.findById(userId);
+    console.log(user)
     if (!user) {
         throw new Error('User not found');
     }
 
       // Check if the provided current password matches the user's actual password
     const isMatch = await user.comparePassword(currentPassword);
+    console.log(isMatch)
     if (!isMatch) {
         throw new Error('Incorrect current password');
     }
@@ -60,13 +90,20 @@ const updatePassword = async (userId, currentPassword, newPassword) => {
 
     return user;
     } catch (error) {
-    throw new Error('Failed to update password');
-    }
+        if (error.message === 'User not found') {
+          throw new Error('Failed to update password: User not found');
+        } else if (error.message === 'Incorrect current password') {
+          throw new Error('Failed to update password: Incorrect current password');
+        } else {
+          throw new Error('Failed to update password');
+        }
+      }
 };
 
 module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    updatePassword
+    updatePassword,
+    getAllUsers
 };

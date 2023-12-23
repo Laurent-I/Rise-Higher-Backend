@@ -16,6 +16,9 @@ router.post('/forgot-password', UserController.forgotPassword);
 router.post('/reset-password', UserController.resetPassword);
 
 // Protected route that requires authentication
+router.get('/users', authenticateToken, UserController.getAllUsers);
+
+// Protected route that requires authentication
 router.get('/users/:userId', authenticateToken, UserController.getUserById);
 
 // Protected route that requires authentication
