@@ -30,6 +30,11 @@ const UserSchema = new Schema({
         required: true,
         minlength: 6
     },
+    profile: {
+        type: Schema.Types.ObjectId,
+        ref: 'Profile',
+        required: true
+},
     timestamps: true
 });
 
