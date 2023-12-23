@@ -94,8 +94,8 @@ const forgotPassword = async(req, res)=> {
         const resetToken = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: '1h' });
 
         // Update the user's reset token in the database
-        User.resetPasswordToken = resetToken;
-        User.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
 
         // Send the password reset email
@@ -124,31 +124,40 @@ const forgotPassword = async(req, res)=> {
 }
 
 // Reset password
-const resetPassword = async(req, res)=> {
-    try {
-        // Get the reset token from the request body
-        const {resetToken, newPassword} = req.body;
+const resetPassword = async (req, res) => {
+  try {
+    // Get the reset token from the request headers
+    const resetToken = req.headers.authorization;
+    const {newPassword} = req.body
 
-        // Check if the reset token is valid
-        const user = await User.findOne({resetPasswordToken: resetToken, resetPasswordExpires: {$gt: Date.now()}});
-        if(!user){
-            return res.status(StatusCodes.BAD_REQUEST).json({error: "Invalid reset token"});
-        }
-
-        // Update the user's password in the database
-        user.password = newPassword;
-        user.resetPasswordToken = null;
-        user.resetPasswordExpires = null;
-        await user.save();
-
-        // Send response
-        res.status(StatusCodes.OK).json({message: "Password reset successfully"});
-
-    } catch (error) {
-      console.log(error)
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: "Failed to process reset password request"});
+    // Check if the reset token is valid
+    const user = await User.findOne({
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: "Invalid reset token" });
     }
-}
+
+    // Update the user's password in the database
+    user.password = newPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    // Send response
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Failed to process reset password request" });
+  }
+};
 
 // Controller function to get a user by ID
 const getUserById = async (req, res) => {
