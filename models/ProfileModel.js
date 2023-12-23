@@ -57,7 +57,11 @@ const ProfileSchema = new Schema({
             required: [true, 'ZIP code is required'],
             trim: true
         }
-    }
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true}
 }, {
     timestamps: true
 });

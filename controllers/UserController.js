@@ -33,29 +33,41 @@ const registerUser = async(req, res)=> {
 
         res.status(StatusCodes.CREATED).json({newUser, token})
     } catch (error) {
+      if (error.name === 'ValidationError') {
+        const validationErrors = Object.values(error.errors).map((err) => err.message);
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: validationErrors });
+      }
+      console.log(error)
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: "Failed to register user"});
     }
 }
 
-// Login an existing user
-const loginUser = async(req, res)=> {
-    try {
+const loginUser = async (req, res) => {
+  try {
+    // Get the username and password from the request body
+    const { username, password } = req.body;
 
-        // Get the username and password from the request body
-        const {username, password} = req.body;
-
-        // Check if the user exists
-        const user = await User.findOne({username});
-
-        // Compare the password given with the password in the database
-        const isMatch = await User.comparePassword(password);
-        if(!isMatch || !user){
-            return res.status(StatusCodes.UNAUTHORIZED).json({error: "Invalid username or password"});
-        }
-    } catch (error) {
-        
+    // Check if the user exists
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
     }
-}
+
+    // Compare the password given with the password in the database
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid username or password" });
+    }
+
+    // Generate a JWT token for the user
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: JWT_SECRET_EXPIRES });
+
+    res.status(StatusCodes.OK).json({ user, token });
+  } catch (error) {
+    console.error(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Failed to login user" });
+  }
+};
 
 // Forgot password
 const transporter = nodemailer.createTransport({
@@ -84,7 +96,7 @@ const forgotPassword = async(req, res)=> {
         // Update the user's reset token in the database
         User.resetPasswordToken = resetToken;
         User.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-        await User.save();
+        await user.save();
 
         // Send the password reset email
         const mailOptions = {
@@ -133,6 +145,7 @@ const resetPassword = async(req, res)=> {
         res.status(StatusCodes.OK).json({message: "Password reset successfully"});
 
     } catch (error) {
+      console.log(error)
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: "Failed to process reset password request"});
     }
 }
@@ -144,6 +157,7 @@ const getUserById = async (req, res) => {
       const user = await userService.getUserById(userId);
       res.status(200).json(user);
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error: error.message });
     }
   };

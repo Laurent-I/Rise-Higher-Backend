@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
+const { authenticateToken } = require('../middleware/AuthMiddleware');
 const UserController = require('../controllers/UserController');
+const router = express.Router();
 
 // Register a new user
 router.post('/register', UserController.registerUser);
@@ -14,16 +15,17 @@ router.post('/forgot-password', UserController.forgotPassword);
 // Reset password
 router.post('/reset-password', UserController.resetPassword);
 
-// Route to get a user by ID
-router.get('/users/:userId', UserController.loginUser, UserController.getUserById);
+// Protected route that requires authentication
+router.get('/users/:userId', authenticateToken, UserController.getUserById);
 
-// Route to update a user
-router.put('/users/:userId',  UserController.loginUser, UserController.updateUser);
+// Protected route that requires authentication
+router.put('/users/:userId', authenticateToken, UserController.updateUser);
 
-// Route to delete a user
-router.delete('/users/:userId', UserController.loginUser, UserController.deleteUser);
+// Protected route that requires authentication
+router.delete('/users/:userId', authenticateToken, UserController.deleteUser);
 
-// Route to update a user's password
-router.put('/users/:userId/password',  UserController.loginUser, UserController.updatePassword);
+// Protected route that requires authentication
+router.put('/users/:userId/password', authenticateToken, UserController.updatePassword);
+
 
 module.exports = router;

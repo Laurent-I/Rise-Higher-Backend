@@ -29,14 +29,8 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         minlength: 6
-    },
-    profile: {
-        type: Schema.Types.ObjectId,
-        ref: 'Profile',
-        required: true
-},
-    timestamps: true
-});
+    }
+}, { timestamps: true });
 
 // Hash the password before saving it to the database
 UserSchema.pre('save', function (next) {
