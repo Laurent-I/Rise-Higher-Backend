@@ -3,6 +3,7 @@ const {StatusCodes} = require('http-status-codes');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET, JWT_SECRET_EXPIRES, EMAIL_PASS, EMAIL_USER, SMTP_PORT, SERVICE} = require('../config');
+const userService = require('../services/user.service');
 
 // Register a new user
 const registerUser = async(req, res)=> {
@@ -136,9 +137,59 @@ const resetPassword = async(req, res)=> {
     }
 }
 
+// Controller function to get a user by ID
+const getUserById = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const user = await userService.getUserById(userId);
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+  // Controller function to update a user
+  const updateUser = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const userData = req.body;
+      const updatedUser = await userService.updateUser(userId, userData);
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+  // Controller function to delete a user
+  const deleteUser = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const deletedUser = await userService.deleteUser(userId);
+      res.status(200).json(deletedUser);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+  
+  // Controller function to update a user's password
+  const updatePassword = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { currentPassword, newPassword } = req.body;
+      const updatedUser = await userService.updatePassword(userId, currentPassword, newPassword);
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
 module.exports = {
     registerUser,
     loginUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getUserById,
+    updateUser,
+    deleteUser,
+    updatePassword,
 }
