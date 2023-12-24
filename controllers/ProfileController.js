@@ -28,9 +28,11 @@ const createProfile = async (req, res)=>{
     try {
         const profileData = req.body;
         const userId = req.userId;
-        const profile = await profileService.createProfile(profileData, userId);
+        const ProfileId = userId;
+        const profile = await profileService.createProfile(profileData, ProfileId);
         res.status(StatusCodes.CREATED).json({profile});
     } catch (error) {
+        // console.log(error)
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message});
     }
 }

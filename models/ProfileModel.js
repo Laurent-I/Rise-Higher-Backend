@@ -24,7 +24,7 @@ const ProfileSchema = new Schema({
             validator: function(value){
                 return value.length > 0
             },
-            message: 'Skills must haev at least one entry'
+            message: 'Skills must have at least one entry'
         }
     },
     experience: {
@@ -58,7 +58,7 @@ const ProfileSchema = new Schema({
             trim: true
         }
     },
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true}
@@ -73,5 +73,11 @@ ProfileSchema.virtual('fullName').get(function () {
 
 // Indexing
 ProfileSchema.index({ firstName: 1, lastName: 1 });
+
+// Logging
+ProfileSchema.post('save', function (doc, next) {
+    console.log('Saved Profile: ' + doc);
+    next();
+});
 
 module.exports = mongoose.model('Profile', ProfileSchema)
