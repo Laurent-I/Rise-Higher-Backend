@@ -4,7 +4,7 @@ const ProfileController = require('../controllers/ProfileController');
 const router = express.Router();
 
 // Create a new profile
-router.post('/profile', authenticateToken, ProfileController.createProfile);
+router.post('/profiles', authenticateToken, ProfileController.createProfile);
 
 // Get all profiles
 router.get('/profiles', authenticateToken, ProfileController.getAllProfiles);

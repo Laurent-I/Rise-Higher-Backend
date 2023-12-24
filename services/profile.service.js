@@ -3,7 +3,7 @@ const Profile = require('../models/ProfileModel');
 // Get All Profiles
 const getAllProfiles = async () => {
     try {
-        const profiles = await Profile.find({}).populate('userId');
+        const profiles = await Profile.find({}).populate('userId', 'username userId');
         if (!profiles) {
             throw new Error('No profiles found');
         }
@@ -38,17 +38,24 @@ const getProfileById = async (profileId) => {
 // Function to create a profile
 const createProfile = async (profileData, userId) => {
     try {
+        // Check if the user already has a profile
+        const existingProfile = await Profile.findOne({ userId });
+        if (existingProfile) {
+            throw new Error('Profile already exists');
+        }
       const profile = await Profile.create({ ...profileData, userId });
       return profile;
     } catch (error) {
       if (error.name === 'ValidationError') {
         const errorMessages = Object.values(error.errors).map((err) => err.message);
         throw new Error(`Failed to create profile: ${errorMessages.join(', ')}`);
-      } else {
+      } else if (error.message === 'Profile already exists') {
+        throw new Error('Profile already exists');
+      }else{
         throw new Error('Failed to create profile');
       }
     }
-  };
+    }
 
 // Function to update a profile
 const updateProfile = async (profileId, profileData) => {
