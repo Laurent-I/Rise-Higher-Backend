@@ -8,7 +8,9 @@ app.use(express.json());
 
 // Routes
 const userRoutes = require('./routes/UserRoutes');
+const profileRoutes = require('./routes/ProfileRoutes');
 app.use('/api/v1/', userRoutes);
+app.use('/api/v1/', profileRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
