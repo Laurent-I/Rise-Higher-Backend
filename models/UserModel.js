@@ -29,7 +29,25 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         minlength: 6
-    }
+    },
+    role:{
+        type: String,
+        enum: ['employee', 'client'],
+        default: 'employee',
+        required: true
+    },
+    profile: {
+        type: Schema.Types.ObjectId,
+        ref: 'Profile'
+    },
+    applications:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Job'
+    }],
+    createdJobs:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Job'
+    }]
 }, { timestamps: true });
 
 // Hash the password before saving it to the database
