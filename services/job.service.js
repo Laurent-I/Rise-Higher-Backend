@@ -50,6 +50,35 @@ const updateJob = async (jobId, updatedData) => {
   }
 };
 
+//Apply for a job
+const applyJob = async (jobId, userId) => {
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) {
+      throw new Error('Job not found');
+    }
+    job.applicants.push(userId);
+    await job.save();
+    return job;
+  } catch (error) {
+    throw new Error('Failed to apply for job');
+  }
+
+}
+
+// Get all applicants for a job
+const getApplicants = async (jobId) => {
+  try {
+    const job = await Job.findById(jobId).populate('applicants');
+    if (!job) {
+      throw new Error('Job not found');
+    }
+    return job.applicants;
+  } catch (error) {
+    throw new Error('Failed to get applicants');
+  }
+};
+
 // Delete a job
 const deleteJob = async (jobId) => {
   try {
@@ -68,5 +97,7 @@ module.exports = {
   getAllJobs,
   getJobById,
   updateJob,
+  applyJob,
+  getApplicants,
   deleteJob
 };
