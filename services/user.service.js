@@ -3,12 +3,13 @@ const User = require('../models/UserModel');
 // Get All Users
 const getAllUsers = async () => {
     try {
-        const users = await User.find({}).populate();
+        const users = await User.find({}).populate('createdJobs', { 'title': 1, 'description': 1 }).populate('profileId', { 'firstName': 1, 'lastName': 1, })
         if (!users) {
             throw new Error('No users found');
         }
         return users;
     } catch (error) {
+        console.log(error)
         if (error.message === 'No users found') {
             throw new Error('Failed to get users: No users found');
         }

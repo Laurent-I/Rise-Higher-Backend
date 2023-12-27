@@ -36,7 +36,7 @@ const UserSchema = new Schema({
         default: 'employee',
         required: true
     },
-    profile: {
+    profileId: {
         type: Schema.Types.ObjectId,
         ref: 'Profile'
     },

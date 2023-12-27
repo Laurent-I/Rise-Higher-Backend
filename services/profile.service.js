@@ -1,4 +1,5 @@
 const Profile = require('../models/ProfileModel');
+const User = require('../models/UserModel');
 
 // Get All Profiles
 const getAllProfiles = async () => {
@@ -44,6 +45,7 @@ const createProfile = async (profileData, userId) => {
             throw new Error('Profile already exists');
         }
       const profile = await Profile.create({ ...profileData, userId });
+      await User.findByIdAndUpdate(userId, {$push: {profileId: profile._id}})
       return profile;
     } catch (error) {
       console.log(error)
