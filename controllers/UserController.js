@@ -8,7 +8,7 @@ const userService = require('../services/user.service');
 // Register a new user
 const registerUser = async(req, res)=> {
     try {
-        const {username, email, password} = req.body;
+        const {username, email, password, role} = req.body;
 
         // Check if the username is already taken
         const existingUsername = await User.findOne({ username });
@@ -23,13 +23,13 @@ const registerUser = async(req, res)=> {
         }
 
         // Create a new user
-        const newUser = new User({username, email, password});
+        const newUser = new User({username, email, password, role});
 
         // Save the new user to the database
         await newUser.save();
-
         // Create a JWT token for the new user
-        const token = jwt.sign({userId: newUser._id}, JWT_SECRET, {expiresIn: JWT_SECRET_EXPIRES });
+        const tokenPayload = {userId: newUser._id, role};
+        const token = jwt.sign(tokenPayload, JWT_SECRET, {expiresIn: JWT_SECRET_EXPIRES });
 
         res.status(StatusCodes.CREATED).json({newUser, token})
     } catch (error) {

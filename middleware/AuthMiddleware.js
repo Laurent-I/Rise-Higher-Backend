@@ -19,7 +19,15 @@ exports.authenticateToken = (req, res, next) => {
     }
 
     req.userId = decoded.userId;
-    console.log(req.userId)
+    req.userRole = decoded.role;
+    console.log(req.userRole)
     next();
   });
 };
+
+exports.authorizeRole = (allowedRoles) => (req, res, next) => {
+  if (!allowedRoles.includes(req.userRole)) {
+      return res.status(StatusCodes.FORBIDDEN).json({message: "Not Authorized To Access this page" })
+  }
+  next()
+}

@@ -1,11 +1,12 @@
 const { StatusCodes } = require('http-status-codes');
-const jobService = require('../services/JobService');
+const jobService = require('../services/job.service');
+const { use } = require('../routes/ProfileRoutes');
 
 // Create a new job
 const createJob = async (req, res) => {
     try {
         const jobData = req.body;
-        const createdBy = req.user._id;
+        const createdBy = req.userId;
         const job = await jobService.createJob(jobData, createdBy);
         res.status(StatusCodes.CREATED).json({ job });
     } catch (error) {
@@ -16,10 +17,15 @@ const createJob = async (req, res) => {
 // Get all jobs
 const getAllJobs = async (req, res) => {
     try {
-        const jobs = await jobService.getAllJobs();
+        const userRole = req.userRole;
+        const userId = req.userId;
+        const jobs = await jobService.getAllJobs(userRole, userId);
+        if (jobs.length === 0) {
+            return res.status(StatusCodes.NOT_FOUND).json({ error: 'No jobs found' });
+        }
         res.status(StatusCodes.OK).json({ jobs });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to get jobs' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
 }
 
@@ -30,7 +36,7 @@ const getJobById = async (req, res) => {
         const job = await jobService.getJobById(jobId);
         res.status(StatusCodes.OK).json({ job });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to get job' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
 }
 
@@ -42,7 +48,7 @@ const updateJob = async (req, res) => {
         const job = await jobService.updateJob(jobId, updatedData);
         res.status(StatusCodes.OK).json({ job });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to update job' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
 }
 
@@ -54,7 +60,7 @@ const applyJob = async (req, res) => {
         const job = await jobService.applyJob(jobId, userId);
         res.status(StatusCodes.OK).json({ job });
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to apply for job' });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error:error.message });
     }
 }
 

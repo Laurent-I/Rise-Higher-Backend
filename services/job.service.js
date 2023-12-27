@@ -15,11 +15,23 @@ const createJob = async (jobData, createdBy) => {
 };
 
 // Get all jobs
-const getAllJobs = async () => {
+const getAllJobs = async (role, userId) => {
   try {
-    const jobs = await Job.find();
+    let jobs;
+
+    if (role === 'admin') {
+      jobs = await Job.find().populate('createdBy', 'username')
+    }else if(role === 'client'){
+      jobs = await Job.find({createdBy: userId})
+    }
+    if (!jobs) {
+      throw new Error('No jobs found');
+    }
     return jobs;
   } catch (error) {
+    if (error.message === 'No jobs found') {
+      throw new Error('Failed to get jobs: No jobs found');
+    }
     throw new Error('Failed to get jobs');
   }
 };
@@ -33,8 +45,13 @@ const getJobById = async (jobId) => {
     }
     return job;
   } catch (error) {
+    console.log(error)
+    if (error.message === 'Job not found') {
+      throw new Error('Job not found');
+    }else{
     throw new Error('Failed to get job');
   }
+}
 };
 
 // Update a job
