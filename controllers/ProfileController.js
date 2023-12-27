@@ -1,6 +1,37 @@
 const profileService = require('../services/profile.service');
+const multer = require('multer');
 const { StatusCodes } = require('http-status-codes');
 
+
+// Set storage engine
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, 'uploads/resume');
+    },
+    filename: function(req, file, cb){
+        console.log(file)
+        cb(null, Date.now() + file.originalname);
+    }
+})
+
+// Define file filter
+const fileFilter = (req, file, cb)=>{
+    if(file.mimetype === 'application/pdf'){
+        cb(null, true);
+    }else{
+        cb(null, false);
+    }
+}
+
+// Define file size
+const fileSize = 1024 * 1024 * 5; // 5MB
+
+// Init upload
+const upload = multer({
+    storage: storage,
+    limits: {fileSize: fileSize},
+    fileFilter: fileFilter
+}).single('resume');
 
 // Get All Profiles
 const getAllProfiles = async (req, res)=>{
@@ -29,6 +60,7 @@ const createProfile = async (req, res)=>{
         const profileData = req.body;
         const userId = req.userId;
         const ProfileId = userId;
+        // const profileData.resume = req.file.path;
         const profile = await profileService.createProfile(profileData, ProfileId);
         res.status(StatusCodes.CREATED).json({profile});
     } catch (error) {
@@ -60,10 +92,12 @@ const deleteProfile = async (req, res)=>{
     }
 }
 
+
 module.exports = {
     getAllProfiles,
     getProfileById,
     createProfile,
     updateProfile,
-    deleteProfile
+    deleteProfile,
+    upload
 }

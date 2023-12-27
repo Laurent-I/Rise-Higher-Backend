@@ -46,6 +46,7 @@ const createProfile = async (profileData, userId) => {
       const profile = await Profile.create({ ...profileData, userId });
       return profile;
     } catch (error) {
+      console.log(error)
       if (error.name === 'ValidationError') {
         const errorMessages = Object.values(error.errors).map((err) => err.message);
         throw new Error(`Failed to create profile: ${errorMessages.join(', ')}`);
@@ -84,10 +85,12 @@ const updateProfile = async (profileId, profileData) => {
       }
       return profile;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        const errorMessages = Object.values(error.errors).map((err) => err.message);
-        throw new Error(`Failed to delete profile: ${errorMessages.join(', ')}`);
-      } else {
+      // console.log(error)
+      if (error.name === 'CastError') {
+        throw new Error('Invalid profile ID');
+      } else if(error.message === 'Profile not found'){
+        throw new Error('Profile not found');
+      } {
         throw new Error('Failed to delete profile');
       }
     }
