@@ -1,4 +1,5 @@
 const Job = require('../models/JobModel');
+const User = require('../models/UserModel');
 
 // Create a job
 const createJob = async (jobData, createdBy) => {
@@ -8,6 +9,9 @@ const createJob = async (jobData, createdBy) => {
       createdBy
     });
     await job.save();
+
+    //Update the user's createdJobs array
+    await User.findByIdAndUpdate(createdBy, { $push: { createdJobs: job._id } });
     return job;
   } catch (error) {
     throw new Error('Failed to create job');

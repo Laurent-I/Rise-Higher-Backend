@@ -3,7 +3,7 @@ const User = require('../models/UserModel');
 // Get All Users
 const getAllUsers = async () => {
     try {
-        const users = await User.find({});
+        const users = await User.find({}).populate();
         if (!users) {
             throw new Error('No users found');
         }
