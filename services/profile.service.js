@@ -85,6 +85,8 @@ const updateProfile = async (profileId, profileData) => {
       if (!profile) {
         throw new Error('Profile not found');
       }
+      //  Remove the profileId from the user's profileId array
+      await User.findByIdAndUpdate(profile.userId, { $pull: { profileId: profile._id } });
       return profile;
     } catch (error) {
       // console.log(error)

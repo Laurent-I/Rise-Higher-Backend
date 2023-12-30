@@ -71,36 +71,6 @@ UserSchema.pre('save', function (next) {
     }
 });
 
-// Add a pre 'remove' hook to delete the associated profile, applications, and createdJobs
-UserSchema.pre('remove', async function (next) {
-    try {
-      // Delete the associated profile
-      await this.model('Profile').deleteOne({ _id: this.profile });
-  
-      // Delete the associated applications
-      await this.model('Job').updateMany(
-        { applicants: this._id },
-        { $pull: { applicants: this._id } }
-      );
-  
-      // Empty the createdBy field in jobs
-      await this.model('Job').updateMany(
-        { createdBy: this._id },
-        { $unset: { createdBy: 1 } }
-      );
-  
-      // Empty the applicants field in jobs
-      await this.model('Job').updateMany(
-        { applicants: this._id },
-        { $pull: { applicants: this._id } }
-      );
-  
-      next();
-    } catch (error) {
-      next(error);
-    }
-  });
-
 // Compare the password given with the password in the database
 UserSchema.methods.comparePassword = async function (password) {
     const isMatch= await bcrypt.compare(password, this.password);

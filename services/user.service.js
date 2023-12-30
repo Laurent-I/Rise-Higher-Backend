@@ -1,9 +1,11 @@
 const User = require('../models/UserModel');
+const Profile = require('../models/ProfileModel');
+const Job = require('../models/JobModel');
 
 // Get All Users
 const getAllUsers = async () => {
     try {
-        const users = await User.find({}).populate('createdJobs', { 'title': 1, 'description': 1 }).populate('profileId', { 'firstName': 1, 'lastName': 1, })
+        const users = await User.find({}).populate('createdJobs', { 'title': 1, 'description': 1 })
         if (!users) {
             throw new Error('No users found');
         }
@@ -54,16 +56,28 @@ const updateUser = async (userId, userData) => {
 // Function to delete a user
 const deleteUser = async (userId) => {
     try {
-        const user = await User.findByIdAndDelete(userId);
+        // Delete the user's profile
+        const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found');
         }
+        await Profile.findByIdAndDelete(user.profileId);
+
+        // Delete the user's jobs
+        await Job.deleteMany({ createdBy: userId });
+
+        // Delete the user's applications
+        await Job.updateMany({ applicants: userId }, { $pull: { applicants: userId } });
+
+        await User.findByIdAndDelete(userId);
+
         return user;
     } catch (error) {
-        if(error.message === 'User not found'){
-            throw new Error('Failed to delete user: User not found')
-        }else{
-        throw new Error('Failed to delete user');
+        console.log(error);
+        if (error.message === 'User not found') {
+            throw new Error('Failed to delete user: User not found');
+        } else {
+            throw new Error('Failed to delete user');
         }
     }
 };

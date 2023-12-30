@@ -40,4 +40,22 @@ const JobSchema = new Schema({
     }]
 }, { timestamps: true });
 
+JobSchema.pre('remove',  {document:true}, async function(next){
+    try {
+        //Get the user who created the job
+        const user = await this.model('User').findById(this.createdBy);
+
+        // Remove the job from the user's createdJobs array 
+        user.createdJobs.pull(this._id); 
+        user.applications.pull(this._id);   
+
+        // Save the user
+        await user.save();
+
+        next();
+    } catch (error) {
+        next(error)
+    }
+})
+
 module.exports = mongoose.model('Job', JobSchema)

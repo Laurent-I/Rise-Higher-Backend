@@ -56,7 +56,7 @@ const updateJob = async (req, res) => {
 const applyJob = async (req, res) => {
     try {
         const { jobId } = req.params;
-        const userId = req.user._id;
+        const userId = req.userId;
         const job = await jobService.applyJob(jobId, userId);
         res.status(StatusCodes.OK).json({ job });
     } catch (error) {

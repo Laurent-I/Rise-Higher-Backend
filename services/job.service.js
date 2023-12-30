@@ -78,12 +78,24 @@ const applyJob = async (jobId, userId) => {
     if (!job) {
       throw new Error('Job not found');
     }
+    if (job.applicants.includes(userId)) {
+      throw new Error('Already applied for this job');
+    }
     job.applicants.push(userId);
+
+    //Update the user's appliedJobs array
+
+    await User.findByIdAndUpdate(userId, { $push: { applications: job._id } });
     await job.save();
     return job;
   } catch (error) {
-    throw new Error('Failed to apply for job');
-  }
+    //console.log(error)
+    if (error.message === 'Job not found') {
+      throw new Error('Job not found');
+    } else if (error.message === 'Already applied for this job') {
+    throw new Error('Already applied for this job');
+  }else{
+    throw new Error('Failed to apply for job');}}
 
 }
 

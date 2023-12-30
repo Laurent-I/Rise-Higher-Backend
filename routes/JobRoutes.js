@@ -17,7 +17,7 @@ router.get('/jobs/:jobId', authenticateToken, authorizeRole(['admin']), JobContr
 router.put('/jobs/:jobId', authenticateToken, authorizeRole(['client', 'admin']), JobController.updateJob);
 
 // Apply for a job
-router.put('/jobs/:jobId/apply', authenticateToken, authorizeRole(['employee', 'admin']), JobController.applyJob);
+router.post('/jobs/:jobId/apply', authenticateToken, authorizeRole(['employee', 'admin']), JobController.applyJob);
 
 // Get all applicants for a job
 router.get('/jobs/:jobId/applicants', authenticateToken, authorizeRole(['admin, client']), JobController.getApplicants);
