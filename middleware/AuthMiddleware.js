@@ -20,7 +20,7 @@ exports.authenticateToken = (req, res, next) => {
 
     req.userId = decoded.userId;
     req.userRole = decoded.role;
-    console.log(req.userRole)
+    // console.log(req.userRole)
     next();
   });
 };

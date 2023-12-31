@@ -47,6 +47,14 @@ const UserSchema = new Schema({
     createdJobs:[{
         type: Schema.Types.ObjectId,
         ref: 'Job'
+    }],
+    reviews:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Review'
+    }],
+    reviewed:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Review'
     }]
 }, { timestamps: true });
 
