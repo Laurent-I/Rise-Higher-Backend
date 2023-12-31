@@ -2,20 +2,43 @@ const Profile = require('../models/ProfileModel');
 const User = require('../models/UserModel');
 
 // Get All Profiles
-const getAllProfiles = async () => {
-    try {
-        const profiles = await Profile.find({}).populate('userId', 'username userId');
-        if (!profiles) {
-            throw new Error('No profiles found');
-        }
-        return profiles;
-    } catch (error) {
-        if (error.message === 'No profiles found'){
-            throw new Error('Failed to get profiles: No profiles found');
-        }
-        throw new Error('Failed to get profiles');
+// Get All Profiles with search, filter, and pagination
+const getAllProfiles = async (searchTerm, filterConditions, page, limit) => {
+  try {
+    // Create a query object
+    let query = {};
+
+    // Add search term to query if it exists
+    if (searchTerm) {
+      query.$text = { $search: searchTerm };
     }
-}
+
+    // Add filter conditions to query if they exist
+    if (filterConditions) {
+      query = { ...query, ...filterConditions };
+    }
+
+    // Calculate the number of documents to skip for pagination
+    const skip = page > 0 ? (page - 1) * limit : 0;
+
+    // Find profiles matching the query, populate 'userId', and apply pagination
+    const profiles = await Profile.find(query)
+      .populate('userId', 'username userId')
+      .skip(skip)
+      .limit(limit);
+
+    if (!profiles) {
+      throw new Error('No profiles found');
+    }
+
+    return profiles;
+  } catch (error) {
+    if (error.message === 'No profiles found'){
+      throw new Error('Failed to get profiles: No profiles found');
+    }
+    throw new Error('Failed to get profiles');
+  }
+};
 
 const getProfileById = async (profileId) => {
     try {

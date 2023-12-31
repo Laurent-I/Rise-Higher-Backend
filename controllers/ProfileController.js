@@ -36,7 +36,8 @@ const upload = multer({
 // Get All Profiles
 const getAllProfiles = async (req, res)=>{
     try {
-        const profiles = await profileService.getAllProfiles();
+        const {q, page, limit, ...filterConditions} = req.query;
+        const profiles = await profileService.getAllProfiles(q, filterConditions, parseInt(page), parseInt(limit));
         res.status(StatusCodes.OK).json({profiles});
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message});

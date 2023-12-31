@@ -78,6 +78,7 @@ ProfileSchema.virtual('fullName').get(function () {
 
 // Indexing
 ProfileSchema.index({ firstName: 1, lastName: 1 });
+ProfileSchema.index({firstName: 'text', lastName: 'text', skills: 'text', experience: 'text', 'address.street': 'text', 'address.city': 'text', 'address.state': 'text', 'address.country': 'text', 'address.zip': 'text'});
 
 // Logging
 ProfileSchema.post('save', function (doc, next) {
