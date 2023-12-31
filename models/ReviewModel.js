@@ -25,4 +25,6 @@ const reviewSchema = new Schema({
     },
 });
 
+reviewSchema.index({rating: 'text', description: 'text'});
+
 module.exports = mongoose.model('Review', reviewSchema);

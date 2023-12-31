@@ -21,9 +21,24 @@ const createReview = async (reviewData, reviewerId) => {
 }
 
 // Get all reviews
-const getAllReviews = async () => {
+const getAllReviews = async (searchTerm, filterConditions, page, limit) => {
     try {
-        const reviews = await Review.find().populate('reviewer', 'username').populate('reviewee', 'username');
+        let query = {};
+
+        // Add search term to query if it exists
+        if (searchTerm) {
+            query.$text = { $search: searchTerm };
+        }
+
+        // Add filter conditions to query if they exist
+        if (filterConditions) {
+            query = { ...query, ...filterConditions };
+        }
+
+        // Calculate the number of documents to skip for pagination
+        const skip = page > 0 ? (page - 1) * limit : 0;
+
+        const reviews = await Review.find(query).populate('reviewer', 'username').populate('reviewee', 'username');
         return reviews;
     } catch (error) {
         throw new Error('Failed to get reviews');

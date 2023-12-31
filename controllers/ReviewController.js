@@ -1,5 +1,6 @@
 const {StatusCodes} = require('http-status-codes');
 const reviewService = require('../services/review.service');
+const { parse } = require('dotenv');
 
 // Create a new review
 const createReview = async(req, res)=> {
@@ -16,7 +17,8 @@ const createReview = async(req, res)=> {
 // Get all reviews
 const getAllReviews = async(req, res)=> {
     try {
-        const reviews = await reviewService.getAllReviews();
+        const {q, page, limit, ...filterConditions} = req.query;
+        const reviews = await reviewService.getAllReviews(q, filterConditions, parseInt(page), parseInt(limit));
         res.status(StatusCodes.OK).json({reviews});
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error: error.message});
