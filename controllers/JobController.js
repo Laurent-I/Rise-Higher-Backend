@@ -19,7 +19,8 @@ const getAllJobs = async (req, res) => {
     try {
         const userRole = req.userRole;
         const userId = req.userId;
-        const jobs = await jobService.getAllJobs(userRole, userId);
+        const {q, page, limit, ...filterConditions} = req.query;
+        const jobs = await jobService.getAllJobs(userRole, userId, q, filterConditions, parseInt(page), parseInt(limit));
         if (jobs.length === 0) {
             return res.status(StatusCodes.NOT_FOUND).json({ error: 'No jobs found' });
         }

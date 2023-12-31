@@ -19,12 +19,28 @@ const createJob = async (jobData, createdBy) => {
 };
 
 // Get all jobs
-const getAllJobs = async (role, userId) => {
+const getAllJobs = async (role, userId, searchTerm, filterConditions, page, limit) => {
   try {
     let jobs;
+    let query = {};
+
+    // Add search term to query if it exists
+    if (searchTerm) {
+      query.$text = { $search: searchTerm };
+    }
+
+    // Add filter conditions to query if they exist
+    if (filterConditions) {
+      query = { ...query, ...filterConditions };
+    }
+
+    // Calculate the number of documents to skip for pagination
+    const skip = page > 0 ? (page - 1) * limit : 0;
+
+
 
     if (role === 'admin') {
-      jobs = await Job.find().populate('createdBy', 'username')
+      jobs = await Job.find(query).populate('createdBy', 'username')
     }else if(role === 'client'){
       jobs = await Job.find({createdBy: userId})
     }

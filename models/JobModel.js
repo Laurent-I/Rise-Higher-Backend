@@ -58,4 +58,6 @@ JobSchema.pre('remove',  {document:true}, async function(next){
     }
 })
 
+JobSchema.index({ title: 'text', description: 'text' });
+
 module.exports = mongoose.model('Job', JobSchema)
