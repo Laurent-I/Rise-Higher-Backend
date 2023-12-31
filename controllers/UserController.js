@@ -2,7 +2,7 @@ const User = require('../models/UserModel');
 const {StatusCodes} = require('http-status-codes');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-const {JWT_SECRET, JWT_SECRET_EXPIRES, EMAIL_PASS, EMAIL_USER, SMTP_PORT, SERVICE} = require('../config');
+const {JWT_SECRET, JWT_SECRET_EXPIRES, EMAIL_PASS, EMAIL_USER, SMTP_PORT, SERVICE, SMTP_USER, SMTP_PASSWORD, SMTP_HOST} = require('../config');
 const userService = require('../services/user.service');
 
 // Register a new user
@@ -71,10 +71,10 @@ const loginUser = async (req, res) => {
 
 // Forgot password
 const transporter = nodemailer.createTransport({
-    service: SERVICE,
+    service: SMTP_HOST,
     auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
+        user: SMTP_USER,
+        pass: SMTP_PASSWORD
     },
     port: SMTP_PORT
 });
@@ -100,7 +100,7 @@ const forgotPassword = async(req, res)=> {
 
         // Send the password reset email
         const mailOptions = {
-            from: EMAIL_USER,
+            from: SMTP_USER,
             to: email,
             subject: 'Rise Higher Password Reset',
             text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +

@@ -24,7 +24,7 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const port = PORT || 3000;
-const mongoURI = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+const mongoURI = `mongodb://127.0.0.1:${DB_PORT}/${DB_NAME}`;
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     console.log('Connected to MongoDB');
