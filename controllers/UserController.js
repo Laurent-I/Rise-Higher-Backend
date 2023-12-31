@@ -159,15 +159,16 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// Controller function to get all users
+// Controller function to get all users with search, filter, and pagination
 const getAllUsers = async (req, res) => {
-    try {
-      const users = await userService.getAllUsers();
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+  try {
+    const { q, page, limit, ...filterConditions } = req.query;
+    const users = await userService.getAllUsers(q, filterConditions, parseInt(page), parseInt(limit));
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Controller function to get a user by ID
 const getUserById = async (req, res) => {

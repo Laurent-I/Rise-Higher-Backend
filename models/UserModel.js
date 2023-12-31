@@ -118,5 +118,6 @@ UserSchema.post('save', function (doc, next) {
 
 // Indexing
 UserSchema.index({ username: 1, email: 1 });
+UserSchema.index({ username: 'text', email: 'text' });
 
 module.exports = mongoose.model('User', UserSchema);

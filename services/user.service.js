@@ -2,13 +2,35 @@ const User = require('../models/UserModel');
 const Profile = require('../models/ProfileModel');
 const Job = require('../models/JobModel');
 
-// Get All Users
-const getAllUsers = async () => {
+// Get All Users with search, filter, and pagination
+const getAllUsers = async (searchTerm, filterConditions, page, limit) => {
     try {
-        const users = await User.find({}).populate('createdJobs', { 'title': 1, 'description': 1 })
+        // Create a query object
+        let query = {};
+
+        // Add search term to query if it exists
+        if (searchTerm) {
+            query.$text = { $search: searchTerm };
+        }
+
+        // Add filter conditions to query if they exist
+        if (filterConditions) {
+            query = { ...query, ...filterConditions };
+        }
+
+        // Calculate the number of documents to skip for pagination
+        const skip = page > 0 ? (page - 1) * limit : 0;
+
+        // Find users matching the query, populate 'createdJobs', and apply pagination
+        const users = await User.find(query)
+            .populate('createdJobs', { 'title': 1, 'description': 1 })
+            .skip(skip)
+            .limit(limit);
+
         if (!users) {
             throw new Error('No users found');
         }
+
         return users;
     } catch (error) {
         console.log(error)
